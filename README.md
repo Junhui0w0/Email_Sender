@@ -1,7 +1,7 @@
 # Email_Sender
 
-**2024-09-22**,
-기본적인 GUI 및 Naver 이메일 전송 테스트 완료
+**2024-09-22**
+, 기본적인 GUI 및 Naver 이메일 전송 테스트 완료
 
 
 -Todo List
