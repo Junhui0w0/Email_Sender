@@ -19,11 +19,12 @@ from tkinter import messagebox  # 들어가야함
 # GUI생성
 root = Tk()
 root.title("Email Sender Project")
-root.geometry("900x600")
+root.geometry("1500x900")
 
 root.option_add("*Font", "맑은고딕 17") #전체 폰트 설정.
 font = tkinter.font.Font(family="맑은고딕", size=30)
 email_font = tkinter.font.Font(family="맑은고딕", size=15)
+
 
 # 이메일 텍스트 라벨
 email_lbl = Label(root)
@@ -54,6 +55,7 @@ FileEntry.place(x=600,y=50)
 FileEntry.config(text="클릭",font=font, background='yellow')
 
 
+
 # 이메일 등록 라벨
 email_register_lbl = Label(root)
 email_register_lbl.place(x=5, y= 300)
@@ -61,14 +63,28 @@ email_register_lbl.config(text="이메일 등록", font=font)
 
 
 #이메일 등록 txt
-email_register_txt = Text(root)
+email_register_txt = Entry(root)
 email_register_txt.place(x=5,y=345)
-email_register_txt.config(width="45", height="3", font=email_font)
+email_register_txt.config(width="45", font=email_font)
+
+def func_email_add():
+    lst = email_register_txt.get().split(' ')
+    with open(email_path, "a") as file:
+        file.write(f"{lst[0]} {lst[1]}\n")
+
+    email_register_txt.config(text='')
+
+    with open(email_path, "r", encoding="utf-8") as file:
+        name_email = file.read()
+    
+    show_registered_email_lbl.config(background="purple", font=font2, foreground="white",
+                                 text=name_email)
 
 #이메일 등록 btn
 email_register_btn = Button(root)
 email_register_btn.place(x=420, y=300)
-email_register_btn.config(text="등록",background='yellow')
+email_register_btn.config(text="등록",background='yellow', command=func_email_add)
+
 
 
 # 이름/이메일 검색 라벨
@@ -101,6 +117,24 @@ var = IntVar()
 naver_rb = Radiobutton(root, text="네이버", variable=var, value=1, foreground='green')
 naver_rb.place(x= 660, y=450)
 
+#등록된 이메일 확인 lbl
+registerd_email_lbl = Label(root)
+registerd_email_lbl.place(x=920, y=5)
+registerd_email_lbl.config(text="등록된 이메일", foreground="purple", font=font)
+
+#등록된 이메일 출력 lbl
+font2 = tkinter.font.Font(family="맑은고딕", size=15)
+print(os.getcwd())
+
+email_path = "C:\\Users\\wydyx\\OneDrive\\바탕 화면\\준희\\프로그래밍\\Python\\!기타활동\\Project\\Email-Sender\\email_receiver.txt"
+with open(email_path, "r", encoding="utf-8") as file:
+    name_email = file.read()
+
+show_registered_email_lbl = Label(root)
+show_registered_email_lbl.place(x=920, y=50)
+show_registered_email_lbl.config(background="purple", font=font2, foreground="white",
+                                 text=name_email)
+
 # daum_rb = Radiobutton(root, text="다음", variable=var, value=2, foreground='blue')
 # daum_rb.place(x= 660, y=480)
 
@@ -130,16 +164,16 @@ def url_select():
     driver.get(url=login_url) #var에 따라 xpath 경로 달라짐
     driver.implicitly_wait(150)
 
-    driver.find_element(By.XPATH,xpath_email_receiver).send_keys("wydyxh@gmail.com")  #이메일을 받는 사람
+    driver.find_element(By.XPATH,xpath_email_receiver).send_keys("abc@gmail.com")  #이메일을 받는 사람
     driver.implicitly_wait(100)
 
-    driver.find_element(By.XPATH,xpath_email_title).send_keys("TEST1") #이메일 제목
+    driver.find_element(By.XPATH,xpath_email_title).send_keys("Email_title") #이메일 제목
     driver.implicitly_wait(100)
 
     #driver.find_element(By.XPATH,xpath1).submit("") #첨부파일은 send_keys ? submit ?
         #정 안되면 첨부파일을 메일창에서 직접 클릭하는 방법으로 진행
 
-    driver.find_element(By.XPATH, xpath_email_file).send_keys("C:\\Users\\wydyx\\OneDrive\\바탕 화면\\준희\\test.pdf")
+    driver.find_element(By.XPATH, xpath_email_file).send_keys("Email_attachment")
     driver.implicitly_wait(10)
     
     driver.find_element(By.XPATH,xpath_email_send).click() #이메일 전송
@@ -147,7 +181,7 @@ def url_select():
 
 #이메일 전송 btn
 email_send = Button(root)
-email_send.place(x=800, y=530)
+email_send.place(x=650, y=530)
 email_send.config(text="이메일 \n전송",background="yellow", command=url_select)
 
 #이메일 전송 웹사이트 선택 Label
