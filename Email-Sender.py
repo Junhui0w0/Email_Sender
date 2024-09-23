@@ -43,17 +43,28 @@ email_txt.config(width="45", height="12", font=email_font)
 # cleanlab1.pack()
 
 
-# 첨부파일 라벨
+# 첨부파일 선택 라벨
 FileLabel = Label(root)
-FileLabel.place(x=500, y= 5)
+FileLabel.place(x=5, y= 690)
 FileLabel.config(text="첨부 파일 선택", font=font)
 
+#첨부파일 선택 버튼을 눌렀을 때 실행할 함수
+file_attach_path=""
+def func_file_attach():
+    global file_attach_path
+    file_attach_path = filedialog.askopenfile()
+    file_attatch_path_lbl.config(text=file_attach_path.name)
 
-#첨부파일 선택
+#첨부파일 선택 버튼
 FileEntry = Button(root)
-FileEntry.place(x=600,y=50)
-FileEntry.config(text="클릭",font=font, background='yellow')
+FileEntry.place(x=5,y=735)
+FileEntry.config(text="클릭",font=font, background='yellow', command=func_file_attach)
 
+
+#첨부파일 경로 확인 lbl
+file_attatch_path_lbl = Label(root)
+file_attatch_path_lbl.place(x=5, y=800)
+file_attatch_path_lbl.config(text=file_attach_path, foreground="red")
 
 
 # 이메일 등록 라벨
@@ -112,6 +123,18 @@ result_lbl = Label(root)
 result_lbl.place(x=5, y=500)
 result_lbl.config(text="검색 결과:", foreground="blue")
 
+
+#이메일 제목 lbl
+email_title_lbl = Label(root)
+email_title_lbl.place(x=5,y=600)
+email_title_lbl.config(text="이메일 제목", font=font)
+
+#이메일 제목 Entry
+email_title_entry = Entry(root)
+email_title_entry.place(x=5, y=650)
+email_title_entry.config(width="45", font=email_font)
+
+
 #네이버/다음/지메일 선택 RadioBtn
 var = IntVar()
 naver_rb = Radiobutton(root, text="네이버", variable=var, value=1, foreground='green')
@@ -124,11 +147,27 @@ registerd_email_lbl.config(text="등록된 이메일", foreground="purple", font
 
 #등록된 이메일 출력 lbl
 font2 = tkinter.font.Font(family="맑은고딕", size=15)
-print(os.getcwd())
+#print(os.getcwd())
 
-email_path = "C:\\Users\\wydyx\\OneDrive\\바탕 화면\\준희\\프로그래밍\\Python\\!기타활동\\Project\\Email-Sender\\email_receiver.txt"
+name_lst = []
+email_lst = []
+
+email_path = "email_receiver.txt"
 with open(email_path, "r", encoding="utf-8") as file:
     name_email = file.read()
+
+    lst = name_email.split('\n')
+    lst.pop(-1) #마지막 공백문자 제거
+    
+    for data in lst:
+        name = data.split(' ')[0]
+        email = data.split(' ')[1]
+
+        name_lst.append(name)
+        email_lst.append(email)
+
+    # print(name_lst)
+    # print(email_lst) #디버깅
 
 show_registered_email_lbl = Label(root)
 show_registered_email_lbl.place(x=920, y=50)
@@ -143,7 +182,7 @@ show_registered_email_lbl.config(background="purple", font=font2, foreground="wh
 
 def url_select():
     #만약 배포할 생각이라면, 아래 chromdrvier.exe 경로를 직접 선택하게 해야할 듯 ?
-    s= Service("C:\\Users\\wydyx\\OneDrive\\바탕 화면\\준희\\프로그래밍\\Python\\!기타활동\\Project\\Email-Sender\\chromedriver.exe")
+    s= Service("chromedriver.exe")
     options = webdriver.ChromeOptions()
     options.add_experimental_option('detach', True)
     driver = webdriver.Chrome(service=s, options=options)
@@ -167,13 +206,13 @@ def url_select():
     driver.find_element(By.XPATH,xpath_email_receiver).send_keys("abc@gmail.com")  #이메일을 받는 사람
     driver.implicitly_wait(100)
 
-    driver.find_element(By.XPATH,xpath_email_title).send_keys("Email_title") #이메일 제목
+    driver.find_element(By.XPATH,xpath_email_title).send_keys(email_title_entry.get()) #이메일 제목
     driver.implicitly_wait(100)
 
     #driver.find_element(By.XPATH,xpath1).submit("") #첨부파일은 send_keys ? submit ?
         #정 안되면 첨부파일을 메일창에서 직접 클릭하는 방법으로 진행
 
-    driver.find_element(By.XPATH, xpath_email_file).send_keys("Email_attachment")
+    driver.find_element(By.XPATH, xpath_email_file).send_keys(file_attach_path.name)
     driver.implicitly_wait(10)
     
     driver.find_element(By.XPATH,xpath_email_send).click() #이메일 전송
