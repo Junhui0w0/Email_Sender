@@ -149,22 +149,9 @@ registerd_email_lbl.config(text="등록된 이메일", foreground="purple", font
 font2 = tkinter.font.Font(family="맑은고딕", size=15)
 #print(os.getcwd())
 
-name_lst = []
-email_lst = []
-
 email_path = "email_receiver.txt"
 with open(email_path, "r", encoding="utf-8") as file:
     name_email = file.read()
-
-    lst = name_email.split('\n')
-    lst.pop(-1) #마지막 공백문자 제거
-    
-    for data in lst:
-        name = data.split(' ')[0]
-        email = data.split(' ')[1]
-
-        name_lst.append(name)
-        email_lst.append(email)
 
     # print(name_lst)
     # print(email_lst) #디버깅
@@ -180,7 +167,9 @@ show_registered_email_lbl.config(background="purple", font=font2, foreground="wh
 # gmail_rb = Radiobutton(root, text="지메일", variable=var, value=3, foreground='black')
 # gmail_rb.place(x= 660, y=510)
 
+name_lst = []
 def url_select():
+    global name_lst
     #만약 배포할 생각이라면, 아래 chromdrvier.exe 경로를 직접 선택하게 해야할 듯 ?
     s= Service("chromedriver.exe")
     options = webdriver.ChromeOptions()
@@ -200,11 +189,35 @@ def url_select():
     #     login_url = 'https://mail.google.com/mail/u/0/#inbox?compose=new'
 
 
-    driver.get(url=login_url) #var에 따라 xpath 경로 달라짐
+    driver.get(url=login_url) #var에 따라 xpath 경로 달 라짐
     driver.implicitly_wait(150)
 
-    driver.find_element(By.XPATH,xpath_email_receiver).send_keys("abc@gmail.com")  #이메일을 받는 사람
-    driver.implicitly_wait(100)
+    name_lst = []
+    email_lst = []
+
+    with open("email_receiver.txt", "r", encoding="utf-8") as file:
+        name_and_email = file.read()
+
+    lst = name_and_email.split('\n')
+    #print(lst) #디버깅
+    lst.pop(-1)
+
+    for data in lst:
+        name = data.split(' ')[0]
+        email = data.split(' ')[1]
+
+        name_lst.append(name)
+        email_lst.append(email)
+
+
+    # driver.find_element(By.XPATH,xpath_email_receiver).send_keys(string_email)  #이메일을 받는 사람
+    # driver.implicitly_wait(100) #한번에 이메일 못 넣는듯 ? 최대 2개만 작성됨
+
+
+    for email in email_lst:
+        driver.find_element(By.XPATH,xpath_email_receiver).send_keys(email+' ')  #이메일을 받는 사람
+        driver.implicitly_wait(100)
+
 
     driver.find_element(By.XPATH,xpath_email_title).send_keys(email_title_entry.get()) #이메일 제목
     driver.implicitly_wait(100)
@@ -213,10 +226,10 @@ def url_select():
         #정 안되면 첨부파일을 메일창에서 직접 클릭하는 방법으로 진행
 
     driver.find_element(By.XPATH, xpath_email_file).send_keys(file_attach_path.name)
-    driver.implicitly_wait(10)
+    driver.implicitly_wait(100)
     
-    driver.find_element(By.XPATH,xpath_email_send).click() #이메일 전송
-    driver.implicitly_wait(10)
+    # driver.find_element(By.XPATH,xpath_email_send).click() #이메일 전송
+    # driver.implicitly_wait(100)
 
 #이메일 전송 btn
 email_send = Button(root)
