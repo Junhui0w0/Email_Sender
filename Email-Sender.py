@@ -1,19 +1,12 @@
-import os
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium import webdriver
-import shutil
+
 import tkinter
 import tkinter.font
 from tkinter import *
 from tkinter import filedialog
-import tkinter as tk
-from tkinter import ttk
-import time
-from tkinter import messagebox  # 들어가야함
-
-# from selenium.webdriver.support.ui import WebDriverWait
-# from selenium.webdriver.support import expected_conditions as EC
+from tkinter import messagebox
 
 
 # GUI생성
@@ -23,67 +16,44 @@ root.geometry("1500x900")
 
 root.option_add("*Font", "맑은고딕 17") #전체 폰트 설정.
 font = tkinter.font.Font(family="맑은고딕", size=30)
-email_font = tkinter.font.Font(family="맑은고딕", size=15)
+email_font = tkinter.font.Font(family="맑은고딕", size=25)
 
 
-# 이메일 텍스트 라벨
-email_lbl = Label(root)
-email_lbl.place(x=5,y=5)
-email_lbl.config(text="이메일 내용 입력", font=font)
+#[Title] 이메일 제목 Position
+email_title_x = 5
+email_title_y = 100
+
+#[Title] 이메일 제목 Label
+email_title_lbl = Label(root)
+email_title_lbl.place(x=email_title_x, y=email_title_y)
+email_title_lbl.config(text="이메일 제목", font=font, foreground="green")
+
+#[Title] 이메일 제목 Entry
+email_title_entry = Entry(root)
+email_title_entry.place(x=email_title_x, y=email_title_y + 50)
+email_title_entry.config(width="45", font=email_font)
 
 
-# 이메일 텍스트 입력
-email_txt = Text(root)
-email_txt.place(x=5,y=50)
-email_txt.config(width="45", height="12", font=email_font)
 
-# # 공백1
-# cleanlab1 = Label(root)
-# cleanlab1.config(text="")
-# cleanlab1.pack()
+#[Registering] 이메일 등록 Position
+email_register_x = email_title_x
+email_register_y = email_title_y + 150
 
-
-# 첨부파일 선택 라벨
-FileLabel = Label(root)
-FileLabel.place(x=5, y= 690)
-FileLabel.config(text="첨부 파일 선택", font=font)
-
-#첨부파일 선택 버튼을 눌렀을 때 실행할 함수
-file_attach_path=""
-def func_file_attach():
-    global file_attach_path
-    file_attach_path = filedialog.askopenfile()
-    file_attatch_path_lbl.config(text=file_attach_path.name)
-
-#첨부파일 선택 버튼
-FileEntry = Button(root)
-FileEntry.place(x=5,y=735)
-FileEntry.config(text="클릭",font=font, background='yellow', command=func_file_attach)
-
-
-#첨부파일 경로 확인 lbl
-file_attatch_path_lbl = Label(root)
-file_attatch_path_lbl.place(x=5, y=800)
-file_attatch_path_lbl.config(text=file_attach_path, foreground="red")
-
-
-# 이메일 등록 라벨
+#[Registering] 이메일 등록 Label
 email_register_lbl = Label(root)
-email_register_lbl.place(x=5, y= 300)
-email_register_lbl.config(text="이메일 등록", font=font)
+email_register_lbl.place(x=email_register_x, y=email_register_y)
+email_register_lbl.config(text="이메일 등록 ex)이름 이메일", font=font, foreground="green")
 
-
-#이메일 등록 txt
+#[Registering] 이메일 등록 Entry
 email_register_txt = Entry(root)
-email_register_txt.place(x=5,y=345)
+email_register_txt.place(x=email_register_x, y=email_register_y + 50)
 email_register_txt.config(width="45", font=email_font)
 
+#[Registering] 이메일 등록버튼 Function
 def func_email_add():
     lst = email_register_txt.get().split(' ')
-    with open(email_path, "a") as file:
+    with open(email_path, "a", encoding="utf-8") as file:
         file.write(f"{lst[0]} {lst[1]}\n")
-
-    email_register_txt.config(text='')
 
     with open(email_path, "r", encoding="utf-8") as file:
         name_email = file.read()
@@ -91,75 +61,148 @@ def func_email_add():
     show_registered_email_lbl.config(background="purple", font=font2, foreground="white",
                                  text=name_email)
 
-#이메일 등록 btn
+    email_register_txt.delete(0, END)
+
+#[Registering] 이메일 등록 Button
 email_register_btn = Button(root)
-email_register_btn.place(x=420, y=300)
+email_register_btn.place(x=email_register_x + 800, y=email_register_y)
 email_register_btn.config(text="등록",background='yellow', command=func_email_add)
 
 
 
-# 이름/이메일 검색 라벨
+#[Search] 이름/이메일 검색 Position
+email_search_x = email_title_x
+email_search_y = email_title_y + 270
+
+#[Search] 이름/이메일 검색 Label
 search_lbl = Label(root)
-search_lbl.place(x=5, y= 430)
-search_lbl.config(text="이메일, 이름 검색")
+search_lbl.place(x=email_search_x, y= email_search_y)
+search_lbl.config(text="이메일 혹은 이름 검색", foreground="green", font=email_font)
 
-#이름/이메일 수정 btn
-email_edit_btn = Button(root)
-email_edit_btn.place(x=350, y=430)
-email_edit_btn.config(text="수정",background='yellow')
-
-#이름/이메일 삭제 btn
-email_del_btn = Button(root)
-email_del_btn.place(x=420, y=430)
-email_del_btn.config(text="삭제",background='yellow')
-
-#이름/이메일 검색 txt
+#[Search] 이름/이메일 검색 Entry
 search_txt = Entry(root)
-search_txt.place(x=5,y=475)
+search_txt.place(x=email_search_x, y=email_search_y + 50)
 search_txt.config(width="45",font=email_font)
 
-#이름/이메일 검색 lbl
+#[Search] 이름/이메일 검색 Label
 result_lbl = Label(root)
-result_lbl.place(x=5, y=500)
-result_lbl.config(text="검색 결과:", foreground="blue")
+result_lbl.place(x=email_search_x, y=email_search_y + 100)
+result_lbl.config(text="[검색 결과]", foreground="blue")
+
+#[Search-Edit] 이름/이메일 수정 Button
+email_edit_btn = Button(root)
+email_edit_btn.place(x=email_search_x+730, y=email_search_y)
+email_edit_btn.config(text="수정",background='yellow')
+
+#[Search-Delete] 이름/이메일 삭제 Function
+def delete_email_func():
+    input_data = search_txt.get()
+    
+    name_lst = []
+    email_lst = []
+
+    with open("email_receiver.txt", "r", encoding="utf-8") as file:
+        name_and_email = file.read()
+
+    lst = name_and_email.split('\n')
+    #print(lst) #디버깅
+    lst.pop(-1)
+
+    for data in lst:
+        name = data.split(' ')[0]
+        email = data.split(' ')[1]
+
+        name_lst.append(name)
+        email_lst.append(email)
+
+    idx = 'INDEX'
+    if '@' in input_data: #입력한 데이터가 이메일 일 때
+        try:
+            idx = email_lst.index(input_data)
+        except ValueError:
+            messagebox.showinfo("Error", "해당 이메일이 존재하지 않습니다.")
+            return 0
+    else:
+        try:
+            idx = name_lst.index(input_data)
+        except ValueError:
+            messagebox.showinfo("Error", "해당 이름이 존재하지 않습니다.")
+            return 0
+
+    if idx == 'INDEX':
+        return 0
+    else:
+        #1. email_receiver.txt 내용 불러오기
+        with open("email_receiver.txt", "r", encoding="utf-8") as file:
+            data = file.read()
+
+        data_lst = data.split('\n')
+
+        #2. index가 idx번째인 내용을 lst에서 삭제
+        data_lst.pop(idx)
+
+        #3.email_receiver.txt에 다시 저장
+        string_data = '\n'.join(data_lst)
+        with open("email_receiver.txt", "w", encoding="utf-8") as file:
+            file.write(string_data)
+
+        #4. show_registered_email_lbl에 email_receiver.txt 내용 입력
+        with open("email_receiver.txt", "r", encoding="utf-8") as file:
+            name_email = file.read()
+    
+        show_registered_email_lbl.config(background="purple", font=font2, foreground="white",
+                                    text=name_email)
+
+        search_txt.delete(0, END)
 
 
-#이메일 제목 lbl
-email_title_lbl = Label(root)
-email_title_lbl.place(x=5,y=600)
-email_title_lbl.config(text="이메일 제목", font=font)
-
-#이메일 제목 Entry
-email_title_entry = Entry(root)
-email_title_entry.place(x=5, y=650)
-email_title_entry.config(width="45", font=email_font)
+#[Search-Delete] 이름/이메일 삭제 Button
+email_del_btn = Button(root)
+email_del_btn.place(x=email_search_x + 800, y=email_search_y)
+email_del_btn.config(text="삭제",background='yellow', command=delete_email_func)
 
 
-#네이버/다음/지메일 선택 RadioBtn
+#[File] 이메일 첨부파일 Position
+file_attatch_x = email_title_x
+file_attatch_y = email_title_y + 500
+
+#[File] 이메일 첨부파일 Label
+FileLabel = Label(root)
+FileLabel.place(x=file_attatch_x, y=file_attatch_y)
+FileLabel.config(text="첨부 파일 선택", font=font, foreground="green")
+
+#[File] 이메일 첨부파일 버튼 Function
+file_attach_path=""
+def func_file_attach():
+    global file_attach_path
+    file_attach_path = filedialog.askopenfile()
+    file_attatch_path_lbl.config(text=file_attach_path.name)
+
+#[File] 첨부파일 Button
+FileEntry = Button(root)
+FileEntry.place(x=file_attatch_x,y=file_attatch_y + 45)
+FileEntry.config(text="클릭",font=font, background='yellow', command=func_file_attach)
+
+#[File] 첨부파일 경로 Label
+file_attatch_path_lbl = Label(root)
+file_attatch_path_lbl.place(x=file_attatch_x, y=file_attatch_y + 120)
+file_attatch_path_lbl.config(text=file_attach_path, foreground="red")
+
+
+
+#[Select] 이메일 전송 사이트 Position
+email_select_x = email_title_x + 400
+email_select_y = email_title_y + 500
+
+#[Select] 이메일 전송 웹사이트 선택 Label
+send_lbl = Label(root)
+send_lbl.config(text="로그인 웹사이트 선택",foreground='red')
+send_lbl.place(x=email_select_x,y=email_select_y)
+
+#[Select] 네이버/다음/지메일 선택 RadioBtn
 var = IntVar()
 naver_rb = Radiobutton(root, text="네이버", variable=var, value=1, foreground='green')
-naver_rb.place(x= 660, y=450)
-
-#등록된 이메일 확인 lbl
-registerd_email_lbl = Label(root)
-registerd_email_lbl.place(x=920, y=5)
-registerd_email_lbl.config(text="등록된 이메일", foreground="purple", font=font)
-
-#등록된 이메일 출력 lbl
-font2 = tkinter.font.Font(family="맑은고딕", size=15)
-#print(os.getcwd())
-
-email_path = "email_receiver.txt"
-with open(email_path, "r", encoding="utf-8") as file:
-    name_email = file.read()
-
-    # print(name_lst)
-    # print(email_lst) #디버깅
-
-show_registered_email_lbl = Label(root)
-show_registered_email_lbl.place(x=920, y=50)
-show_registered_email_lbl.config(background="purple", font=font2, foreground="white",
-                                 text=name_email)
+naver_rb.place(x= email_select_x, y=email_select_y + 30)
 
 # daum_rb = Radiobutton(root, text="다음", variable=var, value=2, foreground='blue')
 # daum_rb.place(x= 660, y=480)
@@ -178,10 +221,10 @@ def url_select():
 
     if(var.get() == 1): 
         login_url = 'https://mail.naver.com/v2/new'
-        xpath_email_receiver = "//input[@class='user_input']" #O
-        xpath_email_title = "//input[@id='subject_title']" #X
-        xpath_email_file = "//input[@id='ATTACH_LOCAL_FILE_ELEMENT_ID']"
-        xpath_email_send = "//button[@class='button_write_task']"
+        xpath_email_receiver = "//input[@class='user_input']" #이메일 수신자
+        xpath_email_title = "//input[@id='subject_title']" #이메일 제목
+        xpath_email_file = "//input[@id='ATTACH_LOCAL_FILE_ELEMENT_ID']" #이메일 첨부파일
+        xpath_email_send = "//button[@class='button_write_task']" #이메일 전송 버튼
 
     # elif(var.get() == 2):
     #     login_url = '다음'
@@ -209,37 +252,49 @@ def url_select():
         name_lst.append(name)
         email_lst.append(email)
 
-
-    # driver.find_element(By.XPATH,xpath_email_receiver).send_keys(string_email)  #이메일을 받는 사람
-    # driver.implicitly_wait(100) #한번에 이메일 못 넣는듯 ? 최대 2개만 작성됨
-
-
     for email in email_lst:
         driver.find_element(By.XPATH,xpath_email_receiver).send_keys(email+' ')  #이메일을 받는 사람
         driver.implicitly_wait(100)
 
-
     driver.find_element(By.XPATH,xpath_email_title).send_keys(email_title_entry.get()) #이메일 제목
     driver.implicitly_wait(100)
 
-    #driver.find_element(By.XPATH,xpath1).submit("") #첨부파일은 send_keys ? submit ?
-        #정 안되면 첨부파일을 메일창에서 직접 클릭하는 방법으로 진행
-
-    driver.find_element(By.XPATH, xpath_email_file).send_keys(file_attach_path.name)
+    driver.find_element(By.XPATH, xpath_email_file).send_keys(file_attach_path.name) #이메일 첨부 파일
     driver.implicitly_wait(100)
-    
-    # driver.find_element(By.XPATH,xpath_email_send).click() #이메일 전송
-    # driver.implicitly_wait(100)
 
-#이메일 전송 btn
+
+#[Select] 이메일 전송 btn
 email_send = Button(root)
-email_send.place(x=650, y=530)
+email_send.place(x=email_select_x - 10, y=email_select_y + 100)
 email_send.config(text="이메일 \n전송",background="yellow", command=url_select)
 
-#이메일 전송 웹사이트 선택 Label
-send_lbl = Label(root)
-send_lbl.config(text="로그인 웹사이트 선택",foreground='red')
-send_lbl.place(x=660,y=420)
+
+
+#[Checking-Registered] 등록된 이메일 Postion
+registerd_email_x = email_title_x + 920
+registerd_email_y = 5
+
+#[Checking-Registered] 등록된 이메일 확인 Label
+registerd_email_lbl = Label(root)
+registerd_email_lbl.place(x=registerd_email_x, y=registerd_email_y)
+registerd_email_lbl.config(text="등록된 이메일", foreground="purple", font=font)
+
+#[Checking-Registered] 등록된 이메일 출력 Label
+font2 = tkinter.font.Font(family="맑은고딕", size=15)
+#print(os.getcwd())
+
+email_path = "email_receiver.txt"
+with open(email_path, "r", encoding="utf-8") as file:
+    name_email = file.read()
+
+    # print(name_lst)
+    # print(email_lst) #디버깅
+
+show_registered_email_lbl = Label(root)
+show_registered_email_lbl.place(x=registerd_email_x, y=registerd_email_y+50)
+show_registered_email_lbl.config(background="purple", font=font2, foreground="white",
+                                 text=name_email)
+
 
 
 root.mainloop()
